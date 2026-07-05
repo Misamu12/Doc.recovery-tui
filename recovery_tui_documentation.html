@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecoveryTUI — Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f1117;--sidebar:#161b27;--content:#0f1117;
+  --border:#1e2535;--border2:#263044;
+  --text:#e2e8f0;--muted:#64748b;--subtle:#94a3b8;
+  --accent:#22c55e;--accent2:#16a34a;
+  --blue:#3b82f6;--orange:#f97316;--red:#ef4444;--purple:#a855f7;--amber:#f59e0b;
+  --code-bg:#1a2035;--code-border:#1e2d4a;
+  --badge-h:14px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px;line-height:1.6}
+
+/* SIDEBAR */
+.sidebar{width:260px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;overflow-y:auto;display:flex;flex-direction:column}
+.logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:600;color:#f1f5f9}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.nav{padding:12px 0;flex:1}
+.nav-section{padding:4px 16px 2px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 16px;color:var(--subtle);font-size:13px;cursor:pointer;border-radius:0;transition:all .15s;border-left:2px solid transparent;text-decoration:none}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--accent);background:rgba(34,197,94,.08);border-left-color:var(--accent)}
+.nav-item .dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(34,197,94,.15);color:var(--accent)}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+.version-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(34,197,94,.1);color:var(--accent);border:1px solid rgba(34,197,94,.2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:500}
+
+/* MAIN */
+.main{margin-left:260px;flex:1;min-height:100vh}
+
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:10;background:rgba(15,17,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.topbar-title span{color:var(--text);font-weight:500}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.btn-sm{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--subtle);cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#000;font-weight:500}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2);color:#000}
+
+/* CONTENT */
+.content{padding:40px 48px 80px;max-width:860px}
+
+/* HERO */
+.hero{margin-bottom:40px;padding-bottom:36px;border-bottom:1px solid var(--border)}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.hero-eyebrow::before{content:'';width:16px;height:2px;background:var(--accent);border-radius:1px}
+.hero h1{font-size:28px;font-weight:600;color:#f8fafc;line-height:1.25;margin-bottom:12px}
+.hero p{font-size:15px;color:var(--subtle);line-height:1.7;max-width:620px;margin-bottom:20px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px}
+.badge-green{background:rgba(34,197,94,.1);color:var(--accent);border:1px solid rgba(34,197,94,.2)}
+.badge-blue{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.badge-orange{background:rgba(249,115,22,.1);color:#fb923c;border:1px solid rgba(249,115,22,.2)}
+.badge-purple{background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.2)}
+.badge-amber{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2)}
+
+/* SECTIONS */
+.section{margin-bottom:48px;scroll-margin-top:64px}
+h2{font-size:18px;font-weight:600;color:#f1f5f9;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+h2 .anchor{font-size:13px;color:var(--muted);font-weight:400;cursor:pointer}
+.section-desc{font-size:14px;color:var(--subtle);margin-bottom:20px;line-height:1.65}
+h3{font-size:14px;font-weight:600;color:#e2e8f0;margin:24px 0 10px}
+p{color:var(--subtle);line-height:1.7;margin-bottom:12px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:4px 0 28px}
+
+/* CODE BLOCKS */
+.code-block{background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;overflow:hidden;margin:16px 0}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--code-border)}
+.code-lang{font-size:11px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:6px}
+.code-lang::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.code-copy{font-size:11px;color:var(--muted);cursor:pointer;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);background:transparent;font-family:inherit;transition:all .15s}
+.code-copy:hover{color:var(--text);border-color:var(--subtle)}
+pre{padding:16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;tab-size:2}
+code{font-family:'JetBrains Mono',monospace;font-size:12px}
+.inline-code{background:rgba(34,197,94,.1);color:#86efac;padding:1px 6px;border-radius:4px;font-size:12px;border:1px solid rgba(34,197,94,.15)}
+
+/* SYNTAX */
+.k{color:#c084fc} .s{color:#86efac} .c{color:#475569;font-style:italic}
+.f{color:#60a5fa} .n{color:#f8fafc} .o{color:#94a3b8} .num{color:#fb923c}
+.cmd{color:#22c55e} .flag{color:#fbbf24} .arg{color:#94a3b8}
+
+/* CMD METHOD BADGES */
+.method{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.04em;font-family:'JetBrains Mono',monospace}
+.method-cli{background:rgba(34,197,94,.15);color:#4ade80}
+.method-file{background:rgba(59,130,246,.15);color:#60a5fa}
+.method-conf{background:rgba(245,158,11,.15);color:#fbbf24}
+.method-get{background:rgba(168,85,247,.15);color:#c084fc}
+
+/* ENDPOINT CARDS */
+.cmd-card{border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin:12px 0;transition:border-color .15s}
+.cmd-card:hover{border-color:var(--border-accent,#263044)}
+.cmd-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.02);cursor:pointer}
+.cmd-path{font-family:'JetBrains Mono',monospace;font-size:13px;color:#e2e8f0;flex:1}
+.cmd-desc{font-size:12px;color:var(--muted)}
+.cmd-body{padding:16px;border-top:1px solid var(--border)}
+
+/* PARAM TABLE */
+.param-table{width:100%;border-collapse:collapse;font-size:13px}
+.param-table th{text-align:left;padding:7px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border)}
+.param-table td{padding:8px 10px;border-bottom:1px solid rgba(30,37,53,.6);vertical-align:top}
+.param-table tr:last-child td{border-bottom:none}
+.param-name{font-family:'JetBrains Mono',monospace;color:#86efac;font-size:12px}
+.param-type{font-family:'JetBrains Mono',monospace;color:#60a5fa;font-size:11px}
+.param-req{font-size:10px;font-weight:600;color:#f87171;background:rgba(239,68,68,.1);padding:1px 5px;border-radius:3px}
+.param-opt{font-size:10px;font-weight:600;color:var(--muted);background:rgba(100,116,139,.1);padding:1px 5px;border-radius:3px}
+.param-desc{color:var(--subtle);font-size:13px}
+
+/* ALERT BOXES */
+.alert{border-radius:8px;padding:12px 16px;margin:16px 0;display:flex;gap:10px;font-size:13px;line-height:1.6}
+.alert-info{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);color:#93c5fd}
+.alert-warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);color:#fcd34d}
+.alert-success{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);color:#86efac}
+.alert-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.card{background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:10px;padding:16px}
+.card-icon{font-size:20px;margin-bottom:10px}
+.card-title{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:4px}
+.card-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* RESPONSE BOX */
+.response-box{background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;overflow:hidden;margin:16px 0}
+.response-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--code-border)}
+.response-status{font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.status-ok{color:#4ade80}
+.status-err{color:#f87171}
+
+/* STEPS */
+.steps{counter-reset:step;margin:16px 0}
+.step{display:flex;gap:14px;margin-bottom:20px;counter-increment:step}
+.step-num{width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--accent);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-content h4{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:4px}
+.step-content p{font-size:13px;color:var(--subtle);margin-bottom:6px}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:-1px}
+.tab{font-size:12px;font-weight:500;padding:8px 14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{padding-top:16px}
+
+/* DISTRO COMPAT */
+.compat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}
+.compat-item{background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:8px;padding:12px 8px;text-align:center}
+.compat-icon{font-size:22px;margin-bottom:6px}
+.compat-name{font-size:11px;font-weight:500;color:#e2e8f0}
+.compat-mgr{font-size:10px;color:var(--muted);margin-top:2px}
+.compat-ok{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.04)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🔄</div>
+    <div>
+      <div class="logo-text">RecoveryTUI</div>
+      <div class="logo-sub">Documentation v1.0</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="nav-section">Démarrage</div>
+    <a class="nav-item active" onclick="scrollTo('intro')"><span class="dot"></span>Introduction</a>
+    <a class="nav-item" onclick="scrollTo('install')"><span class="dot"></span>Installation</a>
+    <a class="nav-item" onclick="scrollTo('quickstart')"><span class="dot"></span>Démarrage rapide</a>
+
+    <div class="nav-section">Interface TUI</div>
+    <a class="nav-item" onclick="scrollTo('tui')"><span class="dot"></span>Lancer le TUI</a>
+    <a class="nav-item" onclick="scrollTo('screens')"><span class="dot"></span>Écrans</a>
+
+    <div class="nav-section">Interface CLI</div>
+    <a class="nav-item" onclick="scrollTo('backup')"><span class="dot"></span>backup <span class="nav-badge">CMD</span></a>
+    <a class="nav-item" onclick="scrollTo('restore')"><span class="dot"></span>restore <span class="nav-badge">CMD</span></a>
+    <a class="nav-item" onclick="scrollTo('list')"><span class="dot"></span>list</a>
+    <a class="nav-item" onclick="scrollTo('config')"><span class="dot"></span>config</a>
+
+    <div class="nav-section">Core</div>
+    <a class="nav-item" onclick="scrollTo('scanner')"><span class="dot"></span>Scanner</a>
+    <a class="nav-item" onclick="scrollTo('snapshots')"><span class="dot"></span>Snapshots</a>
+    <a class="nav-item" onclick="scrollTo('github')"><span class="dot"></span>GitHub Storage</a>
+
+    <div class="nav-section">Référence</div>
+    <a class="nav-item" onclick="scrollTo('compat')"><span class="dot"></span>Compatibilité</a>
+    <a class="nav-item" onclick="scrollTo('config-yaml')"><span class="dot"></span>config.yaml</a>
+    <a class="nav-item" onclick="scrollTo('errors')"><span class="dot"></span>Erreurs</a>
+    <a class="nav-item" onclick="scrollTo('tests')"><span class="dot"></span>Tests</a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="version-pill">● v1.0.0 stable</div>
+    <div style="margin-top:8px;font-size:11px">Python 3.8+ · MIT License</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Docs / <span>RecoveryTUI</span></div>
+    <div class="topbar-actions">
+      <button class="btn-sm">GitHub</button>
+      <button class="btn-sm btn-primary">⬇ Télécharger</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HERO -->
+    <div class="hero" id="intro">
+      <div class="hero-eyebrow">Documentation officielle</div>
+      <h1>RecoveryTUI — Backup &amp; Restore Linux</h1>
+      <p>Sauvegardez et restaurez vos applications Linux installées en quelques secondes. Interface TUI intuitive, CLI puissant, et support de 5 gestionnaires de paquets.</p>
+      <div class="hero-badges">
+        <span class="badge badge-green">✓ APT / Snap</span>
+        <span class="badge badge-blue">✓ Flatpak</span>
+        <span class="badge badge-orange">✓ Pacman</span>
+        <span class="badge badge-purple">✓ DNF</span>
+        <span class="badge badge-amber">✓ GitHub Storage</span>
+      </div>
+    </div>
+
+    <!-- INSTALLATION -->
+    <div class="section" id="install">
+      <h2>Installation <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">Deux méthodes d'installation : script automatique ou manuelle avec virtualenv.</p>
+
+      <h3>Script automatique</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="this.textContent='✓ Copié!'">Copier</button>
+        </div>
+        <pre><span class="cmd">curl</span> <span class="flag">-sSL</span> <span class="s">https://github.com/Misamu12/recovery-tui/install.sh</span> | bash</pre>
+      </div>
+
+      <h3>Installation manuelle (recommandée)</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Extraire et naviguer dans le dossier</h4>
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span></div>
+<pre><span class="cmd">unzip</span> recovery_tui_v1.0.zip <span class="flag">&&</span> <span class="cmd">cd</span> recovery_tui</pre></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Créer un environnement virtuel</h4>
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span></div>
+<pre><span class="cmd">python3 -m</span> venv .venv
+<span class="cmd">source</span> .venv/bin/activate</pre></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Installer les dépendances</h4>
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span></div>
+<pre><span class="cmd">pip</span> install <span class="flag">-r</span> requirements.txt
+<span class="cmd">pip</span> install <span class="flag">-e</span> .</pre></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Vérifier l'installation</h4>
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span></div>
+<pre><span class="cmd">recovery-tui</span> <span class="flag">--version</span>
+<span class="c"># recovery-tui, version 1.0.0</span></pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warn">
+        <span class="alert-icon">⚠</span>
+        <span>Sur Ubuntu 23+ ou Debian 12+, utilisez <code class="inline-code">pip install --break-system-packages</code> si vous n'utilisez pas de virtualenv.</span>
+      </div>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="section" id="quickstart">
+      <h2>Démarrage rapide <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">🖥</div><div class="card-title">Interface TUI</div><div class="card-desc">Navigation clavier complète, visualisation des apps, confirmation interactive.</div></div>
+        <div class="card"><div class="card-icon">⌨️</div><div class="card-title">CLI puissant</div><div class="card-desc">Automatisation, scripts CI/CD, dry-run, compression gzip.</div></div>
+        <div class="card"><div class="card-icon">☁️</div><div class="card-title">GitHub Storage</div><div class="card-desc">Push/pull de snapshots vers un repo GitHub privé via token.</div></div>
+        <div class="card"><div class="card-icon">🐳</div><div class="card-title">Multi-distro</div><div class="card-desc">APT, Snap, Flatpak, Pacman, DNF — détection automatique.</div></div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash — workflow complet en 3 commandes</span></div>
+        <pre><span class="c"># 1. Sauvegarder toutes les apps installées</span>
+<span class="cmd">recovery-tui</span> backup <span class="flag">--label</span> <span class="s">"avant-migration"</span>
+
+<span class="c"># 2. Lister les snapshots disponibles</span>
+<span class="cmd">recovery-tui</span> list
+
+<span class="c"># 3. Restaurer sur le nouveau système</span>
+<span class="cmd">recovery-tui</span> restore <span class="flag">--skip-confirm</span></pre>
+      </div>
+    </div>
+
+    <!-- TUI -->
+    <div class="section" id="tui">
+      <h2>Interface TUI <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="method method-cli">TUI</span>
+          <span class="cmd-path">recovery-tui tui</span>
+          <span class="cmd-desc">Lance l'interface Textual interactive</span>
+        </div>
+      </div>
+
+      <h3>Raccourcis clavier globaux</h3>
+      <table class="param-table" style="margin:12px 0">
+        <thead><tr><th>Touche</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code class="inline-code">Ctrl+B</code></td><td class="param-desc">Ouvrir l'écran Backup</td></tr>
+          <tr><td><code class="inline-code">Ctrl+R</code></td><td class="param-desc">Ouvrir l'écran Restore</td></tr>
+          <tr><td><code class="inline-code">Ctrl+C</code></td><td class="param-desc">Ouvrir la configuration</td></tr>
+          <tr><td><code class="inline-code">Échap</code></td><td class="param-desc">Revenir à l'écran précédent</td></tr>
+          <tr><td><code class="inline-code">Ctrl+Q</code></td><td class="param-desc">Quitter l'application</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SCREENS -->
+    <div class="section" id="screens">
+      <h2>Écrans TUI <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-title">📦 Backup</div><div class="card-desc">Scan des apps, tableau interactif, sauvegarde locale ou GitHub, compression.</div></div>
+        <div class="card"><div class="card-title">♻️ Restore</div><div class="card-desc">Liste des snapshots, prévisualisation des apps, vérification d'espace, dry-run.</div></div>
+        <div class="card"><div class="card-title">⚙️ Config</div><div class="card-desc">Édition du storage (local/GitHub), token, repo, branche, thème.</div></div>
+        <div class="card"><div class="card-title">➕ Add App</div><div class="card-desc">Ajout manuel d'une application avec nom, version, gestionnaire et fichiers de config.</div></div>
+      </div>
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ</span>
+        <span>La modal <strong>ConfirmScreen</strong> s'affiche avant chaque restauration et affiche l'espace disque requis vs disponible. Elle bloque le bouton Confirmer si l'espace est insuffisant.</span>
+      </div>
+    </div>
+
+    <!-- CMD: BACKUP -->
+    <div class="section" id="backup">
+      <h2>backup <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">Scanne les applications installées et génère un fichier snapshot JSON (ou .json.gz).</p>
+
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="method method-cli">CMD</span>
+          <span class="cmd-path">recovery-tui backup [OPTIONS]</span>
+        </div>
+        <div class="cmd-body">
+          <table class="param-table">
+            <thead><tr><th>Option</th><th>Type</th><th>Requis</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">--label, -l</td><td class="param-type">string</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Nom du snapshot (ex: "avant-migration"). Timestamp auto si absent.</td></tr>
+              <tr><td class="param-name">--output, -o</td><td class="param-type">path</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Dossier de destination. Défaut: <code class="inline-code">~/.local/share/recovery-tui/snapshots/</code></td></tr>
+              <tr><td class="param-name">--compress</td><td class="param-type">flag</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Compresse le snapshot en <code class="inline-code">.json.gz</code>.</td></tr>
+              <tr><td class="param-name">--github</td><td class="param-type">flag</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Pousse aussi le snapshot vers GitHub après sauvegarde locale.</td></tr>
+              <tr><td class="param-name">--managers, -m</td><td class="param-type">string</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Gestionnaires à scanner, séparés par virgule. Ex: <code class="inline-code">apt,snap</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3>Exemples</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="this.textContent='✓ Copié!'">Copier</button></div>
+        <pre><span class="c"># Backup simple</span>
+<span class="cmd">recovery-tui</span> backup
+
+<span class="c"># Avec label et compression</span>
+<span class="cmd">recovery-tui</span> backup <span class="flag">--label</span> <span class="s">"ubuntu-22.04"</span> <span class="flag">--compress</span>
+
+<span class="c"># APT et Snap uniquement, push GitHub</span>
+<span class="cmd">recovery-tui</span> backup <span class="flag">--managers</span> <span class="s">apt,snap</span> <span class="flag">--github</span>
+
+<span class="c"># Vers un dossier personnalisé</span>
+<span class="cmd">recovery-tui</span> backup <span class="flag">--output</span> /mnt/backup/</pre>
+      </div>
+
+      <h3>Fichier de sortie</h3>
+      <div class="response-box">
+        <div class="response-header">
+          <span class="response-status status-ok">snapshot_2026-06-28_14-30-00.json</span>
+          <span style="font-size:11px;color:var(--muted)">JSON</span>
+        </div>
+        <pre style="padding:14px;font-size:12px"><span class="o">{</span>
+  <span class="s">"version"</span><span class="o">:</span> <span class="s">"1.0"</span><span class="o">,</span>
+  <span class="s">"created_at"</span><span class="o">:</span> <span class="s">"2026-06-28T14:30:00+00:00"</span><span class="o">,</span>
+  <span class="s">"label"</span><span class="o">:</span> <span class="s">"ubuntu-22.04"</span><span class="o">,</span>
+  <span class="s">"total_apps"</span><span class="o">:</span> <span class="num">142</span><span class="o">,</span>
+  <span class="s">"total_size_mb"</span><span class="o">:</span> <span class="num">4821.5</span><span class="o">,</span>
+  <span class="s">"apps"</span><span class="o">: [</span>
+    <span class="o">{</span>
+      <span class="s">"name"</span><span class="o">:</span> <span class="s">"vim"</span><span class="o">,</span>
+      <span class="s">"version"</span><span class="o">:</span> <span class="s">"9.0.1749-1"</span><span class="o">,</span>
+      <span class="s">"manager"</span><span class="o">:</span> <span class="s">"apt"</span><span class="o">,</span>
+      <span class="s">"size_mb"</span><span class="o">:</span> <span class="num">25.0</span><span class="o">,</span>
+      <span class="s">"install_cmd"</span><span class="o">:</span> <span class="s">"sudo apt install -y vim"</span><span class="o">,</span>
+      <span class="s">"config_files"</span><span class="o">: [</span><span class="s">"~/.vimrc"</span><span class="o">]</span>
+    <span class="o">}</span>
+  <span class="o">]</span>
+<span class="o">}</span></pre>
+      </div>
+    </div>
+
+    <!-- CMD: RESTORE -->
+    <div class="section" id="restore">
+      <h2>restore <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">Installe toutes les applications d'un snapshot sur le système courant.</p>
+
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="method method-cli">CMD</span>
+          <span class="cmd-path">recovery-tui restore [SNAPSHOT] [OPTIONS]</span>
+        </div>
+        <div class="cmd-body">
+          <table class="param-table">
+            <thead><tr><th>Option</th><th>Type</th><th>Requis</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">SNAPSHOT</td><td class="param-type">path</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Chemin vers un fichier .json ou .json.gz. Si absent, utilise le plus récent.</td></tr>
+              <tr><td class="param-name">--snapshot-label, -s</td><td class="param-type">string</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Restaurer par label partiel.</td></tr>
+              <tr><td class="param-name">--dry-run</td><td class="param-type">flag</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Simule la restauration sans installer aucun paquet.</td></tr>
+              <tr><td class="param-name">--force</td><td class="param-type">flag</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Bypass la vérification d'espace disque.</td></tr>
+              <tr><td class="param-name">--skip-confirm</td><td class="param-type">flag</td><td><span class="param-opt">optionnel</span></td><td class="param-desc">Supprime la confirmation interactive (utile en CI/CD).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3>Exemples</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="this.textContent='✓ Copié!'">Copier</button></div>
+        <pre><span class="c"># Restaurer le dernier snapshot</span>
+<span class="cmd">recovery-tui</span> restore
+
+<span class="c"># Dry-run pour prévisualiser</span>
+<span class="cmd">recovery-tui</span> restore <span class="flag">--dry-run</span>
+
+<span class="c"># Depuis un fichier précis</span>
+<span class="cmd">recovery-tui</span> restore ./snapshot_ubuntu-22.04.json
+
+<span class="c"># Par label, sans confirmation (CI/CD)</span>
+<span class="cmd">recovery-tui</span> restore <span class="flag">-s</span> <span class="s">"avant-migration"</span> <span class="flag">--skip-confirm</span>
+
+<span class="c"># Forcer malgré espace insuffisant</span>
+<span class="cmd">recovery-tui</span> restore <span class="flag">--force</span> <span class="flag">--skip-confirm</span></pre>
+      </div>
+
+      <div class="alert alert-success">
+        <span class="alert-icon">✓</span>
+        <span>La commande restore vérifie automatiquement l'espace disque disponible vs requis avant d'installer quoi que ce soit. Utilisez <code class="inline-code">--dry-run</code> pour tester sans risque.</span>
+      </div>
+    </div>
+
+    <!-- CMD: LIST -->
+    <div class="section" id="list">
+      <h2>list <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="method method-get">CMD</span>
+          <span class="cmd-path">recovery-tui list [--json-output]</span>
+          <span class="cmd-desc">Liste les snapshots locaux</span>
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span></div>
+        <pre><span class="c"># Affichage tableau</span>
+<span class="cmd">recovery-tui</span> list
+
+<span class="c"># Export JSON (pour scripts)</span>
+<span class="cmd">recovery-tui</span> list <span class="flag">--json-output</span> | <span class="cmd">jq</span> <span class="s">'.[0]'</span></pre>
+      </div>
+      <div class="response-box">
+        <div class="response-header"><span class="response-status status-ok">Sortie</span></div>
+        <pre style="padding:14px;font-size:12px"><span class="c">Label                               Date                  Apps       Size</span>
+<span class="n">─────────────────────────────────────────────────────────────────────────</span>
+<span class="s">avant-migration                     2026-06-28 14:30:00    142    4.71 GB</span>
+<span class="s">ubuntu-22.04                        2026-05-01 09:12:33     98    2.30 GB</span></pre>
+      </div>
+    </div>
+
+    <!-- CMD: CONFIG -->
+    <div class="section" id="config">
+      <h2>config <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="method method-conf">CMD</span>
+          <span class="cmd-path">recovery-tui config &lt;get|set|show&gt;</span>
+        </div>
+        <div class="cmd-body">
+          <table class="param-table">
+            <thead><tr><th>Sous-commande</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">config get KEY</td><td class="param-desc">Lire une valeur (notation pointée)</td></tr>
+              <tr><td class="param-name">config set KEY VALUE</td><td class="param-desc">Écrire une valeur et persister</td></tr>
+              <tr><td class="param-name">config show</td><td class="param-desc">Afficher toute la configuration YAML</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span></div>
+        <pre><span class="cmd">recovery-tui</span> config set github.token <span class="s">ghp_xxxxxxxxxxxx</span>
+<span class="cmd">recovery-tui</span> config set github.repo <span class="s">monuser/mes-apps</span>
+<span class="cmd">recovery-tui</span> config get storage.type
+<span class="cmd">recovery-tui</span> config show</pre>
+      </div>
+    </div>
+
+    <!-- SCANNER -->
+    <div class="section" id="scanner">
+      <h2>Scanner — core/scanner.py <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">Le scanner détecte automatiquement les gestionnaires disponibles et les scanne en parallèle via <code class="inline-code">asyncio.gather()</code>.</p>
+      <h3>Structure AppEntry</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">python</span></div>
+        <pre><span class="k">AppEntry</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="s">"name"</span><span class="o">:</span>        <span class="k">str</span><span class="o">,</span>   <span class="c"># "vim"</span>
+  <span class="s">"version"</span><span class="o">:</span>     <span class="k">str</span><span class="o">,</span>   <span class="c"># "9.0.1749-1"</span>
+  <span class="s">"manager"</span><span class="o">:</span>     <span class="k">str</span><span class="o">,</span>   <span class="c"># "apt" | "snap" | "flatpak" | "pacman" | "dnf"</span>
+  <span class="s">"size_mb"</span><span class="o">:</span>     <span class="k">float</span><span class="o">,</span> <span class="c"># 25.0</span>
+  <span class="s">"category"</span><span class="o">:</span>    <span class="k">str</span><span class="o">,</span>   <span class="c"># "Dev" | "Essential" | "Multimedia" | ...</span>
+  <span class="s">"install_cmd"</span><span class="o">:</span> <span class="k">str</span><span class="o">,</span>   <span class="c"># "sudo apt install -y vim"</span>
+  <span class="s">"config_files"</span><span class="o">:</span> <span class="k">list</span>  <span class="c"># ["~/.vimrc"]</span>
+<span class="o">}</span></pre>
+      </div>
+      <h3>API Python</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">python</span></div>
+        <pre><span class="k">import</span> asyncio
+<span class="k">from</span> recovery_tui.core.scanner <span class="k">import</span> scan_all
+
+<span class="c"># Scan tous les gestionnaires disponibles</span>
+apps <span class="o">=</span> asyncio.run<span class="o">(</span>scan_all<span class="o">())</span>
+
+<span class="c"># Scan uniquement APT et Snap</span>
+apps <span class="o">=</span> asyncio.run<span class="o">(</span>scan_all<span class="o">(</span>managers<span class="o">=[</span><span class="s">"apt"</span><span class="o">,</span> <span class="s">"snap"</span><span class="o">]))</span>
+
+<span class="c"># → liste de AppEntry dicts, triée par (manager, name)</span></pre>
+      </div>
+    </div>
+
+    <!-- SNAPSHOTS -->
+    <div class="section" id="snapshots">
+      <h2>Snapshots — core/backup.py <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">python — API complète</span></div>
+        <pre><span class="k">from</span> recovery_tui.core.backup <span class="k">import</span> build_snapshot, save_snapshot, load_snapshot
+<span class="k">from</span> recovery_tui.storage.local <span class="k">import</span> save_local, list_local_snapshots
+
+<span class="c"># Créer et sauvegarder</span>
+snapshot <span class="o">=</span> build_snapshot<span class="o">(</span>apps, label<span class="o">=</span><span class="s">"test"</span>, compress<span class="o">=</span><span class="k">False</span><span class="o">)</span>
+path <span class="o">=</span> save_local<span class="o">(</span>apps, label<span class="o">=</span><span class="s">"test"</span><span class="o">)</span>
+
+<span class="c"># Charger</span>
+data <span class="o">=</span> load_snapshot<span class="o">(</span>path<span class="o">)</span>
+apps <span class="o">=</span> data<span class="o">[</span><span class="s">"apps"</span><span class="o">]</span>
+
+<span class="c"># Lister (tri newest-first)</span>
+snaps <span class="o">=</span> list_local_snapshots<span class="o">()</span>  <span class="c"># → [{"label","created_at","path",...}]</span></pre>
+      </div>
+    </div>
+
+    <!-- GITHUB -->
+    <div class="section" id="github">
+      <h2>GitHub Storage <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">Poussez vos snapshots vers un repository GitHub privé pour les restaurer sur n'importe quel système.</p>
+
+      <h3>Configuration</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span></div>
+        <pre><span class="c"># 1. Créer un token GitHub (Settings → Developer → Personal access tokens)</span>
+<span class="c">#    Permissions requises : repo (read/write)</span>
+
+<span class="c"># 2. Configurer RecoveryTUI</span>
+<span class="cmd">recovery-tui</span> config set github.token ghp_xxxxxxxxxxxxxxxx
+<span class="cmd">recovery-tui</span> config set github.repo <span class="s">monuser/recovery-backup</span>
+<span class="cmd">recovery-tui</span> config set github.branch main</pre>
+      </div>
+
+      <h3>Utilisation</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span></div>
+        <pre><span class="c"># Push lors du backup</span>
+<span class="cmd">recovery-tui</span> backup <span class="flag">--github</span>
+
+<span class="c"># Pull depuis le TUI : écran Restore → bouton "☁ From GitHub"</span></pre>
+      </div>
+
+      <div class="alert alert-warn">
+        <span class="alert-icon">⚠</span>
+        <span>Ne committez jamais votre token GitHub dans le code source. Il est stocké uniquement dans <code class="inline-code">~/.config/recovery-tui/config.yaml</code> qui est ignoré par git.</span>
+      </div>
+    </div>
+
+    <!-- COMPATIBILITÉ -->
+    <div class="section" id="compat">
+      <h2>Compatibilité <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="compat-grid">
+        <div class="compat-item compat-ok"><div class="compat-icon">🐧</div><div class="compat-name">Ubuntu</div><div class="compat-mgr">APT · Snap</div></div>
+        <div class="compat-item compat-ok"><div class="compat-icon">🌀</div><div class="compat-name">Debian</div><div class="compat-mgr">APT</div></div>
+        <div class="compat-item compat-ok"><div class="compat-icon">🎩</div><div class="compat-name">Fedora</div><div class="compat-mgr">DNF · Flatpak</div></div>
+        <div class="compat-item compat-ok"><div class="compat-icon">🔷</div><div class="compat-name">Arch</div><div class="compat-mgr">Pacman</div></div>
+        <div class="compat-item compat-ok"><div class="compat-icon">🦜</div><div class="compat-name">Parrot OS</div><div class="compat-mgr">APT · Flatpak</div></div>
+      </div>
+      <p>Tous les gestionnaires supportent aussi <span class="badge badge-blue" style="display:inline-flex;font-size:11px">Flatpak</span> de manière transversale.</p>
+    </div>
+
+    <!-- CONFIG YAML -->
+    <div class="section" id="config-yaml">
+      <h2>config.yaml — Référence complète <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">Fichier généré automatiquement à <code class="inline-code">~/.config/recovery-tui/config.yaml</code></p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">yaml</span><button class="code-copy" onclick="this.textContent='✓ Copié!'">Copier</button></div>
+        <pre><span class="f">storage</span><span class="o">:</span>
+  <span class="f">type</span><span class="o">:</span> <span class="s">local</span>                  <span class="c"># "local" | "github"</span>
+  <span class="f">local_path</span><span class="o">:</span> <span class="s">~/.local/share/recovery-tui/snapshots</span>
+
+<span class="f">github</span><span class="o">:</span>
+  <span class="f">token</span><span class="o">:</span> <span class="s">""</span>                    <span class="c"># ghp_xxxxxxxxxx</span>
+  <span class="f">repo</span><span class="o">:</span>  <span class="s">""</span>                    <span class="c"># username/repo-name</span>
+  <span class="f">branch</span><span class="o">:</span> <span class="s">main</span>
+
+<span class="f">scanner</span><span class="o">:</span>
+  <span class="f">enabled_managers</span><span class="o">:</span>
+    <span class="o">-</span> <span class="s">apt</span>
+    <span class="o">-</span> <span class="s">snap</span>
+    <span class="o">-</span> <span class="s">flatpak</span>
+    <span class="o">-</span> <span class="s">pacman</span>
+    <span class="o">-</span> <span class="s">dnf</span>
+  <span class="f">exclude_packages</span><span class="o">: []</span>        <span class="c"># ex: ["linux-firmware"]</span>
+
+<span class="f">ui</span><span class="o">:</span>
+  <span class="f">theme</span><span class="o">:</span> <span class="s">dark</span>
+  <span class="f">language</span><span class="o">:</span> <span class="s">en</span></pre>
+      </div>
+    </div>
+
+    <!-- ERRORS -->
+    <div class="section" id="errors">
+      <h2>Erreurs courantes <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <div class="cmd-card" style="margin-bottom:10px">
+        <div class="cmd-header"><span class="method method-file" style="background:rgba(239,68,68,.15);color:#f87171">ERR</span><span class="cmd-path">ModuleNotFoundError: No module named 'recovery_tui'</span></div>
+        <div class="cmd-body"><p style="margin:0;font-size:13px;color:var(--subtle)">Le package n'est pas installé dans le bon virtualenv. Vérifiez que <code class="inline-code">source .venv/bin/activate</code> est actif puis relancez <code class="inline-code">pip install -e .</code> depuis le dossier contenant <code class="inline-code">setup.py</code>.</p></div>
+      </div>
+      <div class="cmd-card" style="margin-bottom:10px">
+        <div class="cmd-header"><span class="method method-file" style="background:rgba(239,68,68,.15);color:#f87171">ERR</span><span class="cmd-path">Invalid CSS property 'variant'</span></div>
+        <div class="cmd-body"><p style="margin:0;font-size:13px;color:var(--subtle)"><code class="inline-code">variant</code> est un attribut Python, pas une propriété CSS Textual. Supprimez les blocs <code class="inline-code">#btn-X { variant: ... }</code> du CSS inline dans les screens.</p></div>
+      </div>
+      <div class="cmd-card" style="margin-bottom:10px">
+        <div class="cmd-header"><span class="method method-file" style="background:rgba(239,68,68,.15);color:#f87171">ERR</span><span class="cmd-path">permission denied while trying to connect to Docker</span></div>
+        <div class="cmd-body"><p style="margin:0;font-size:13px;color:var(--subtle)">Votre utilisateur n'est pas dans le groupe docker. Exécutez <code class="inline-code">sudo usermod -aG docker $USER && newgrp docker</code>, puis reconnectez-vous.</p></div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header"><span class="method method-file" style="background:rgba(239,68,68,.15);color:#f87171">ERR</span><span class="cmd-path">GitHub token not configured / ValueError</span></div>
+        <div class="cmd-body"><p style="margin:0;font-size:13px;color:var(--subtle)">Configurez le token via <code class="inline-code">recovery-tui config set github.token ghp_xxx</code> et le repo via <code class="inline-code">recovery-tui config set github.repo user/repo</code>.</p></div>
+      </div>
+    </div>
+
+    <!-- TESTS -->
+    <div class="section" id="tests">
+      <h2>Tests &amp; VM <span class="anchor">#</span></h2>
+      <div class="divider"></div>
+      <h3>Lancer la suite complète</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span></div>
+        <pre><span class="c"># Tous les tests (96 tests)</span>
+<span class="cmd">pytest</span> tests/ <span class="flag">-v</span>
+
+<span class="c"># Unitaires uniquement</span>
+<span class="cmd">pytest</span> tests/unit/ <span class="flag">-v --no-cov</span>
+
+<span class="c"># Simulation VM (APT, Snap, Flatpak, Pacman, DNF)</span>
+<span class="cmd">pytest</span> tests/integration/test_vm_simulation.py <span class="flag">-v</span>
+
+<span class="c"># Avec vrais binaires (dans une vraie VM)</span>
+<span class="cmd">RECOVERY_TUI_REAL_CMDS=1</span> <span class="cmd">pytest</span> tests/integration/test_vm_simulation.py</pre>
+      </div>
+
+      <h3>Docker multi-distro</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span></div>
+        <pre><span class="c"># Toutes les distros en parallèle</span>
+<span class="cmd">docker compose up</span> <span class="flag">--build</span>
+
+<span class="c"># Ubuntu uniquement</span>
+<span class="cmd">docker compose run</span> ubuntu-tests
+
+<span class="c"># Fedora uniquement</span>
+<span class="cmd">docker compose run</span> fedora-tests</pre>
+      </div>
+
+      <table class="param-table" style="margin-top:16px">
+        <thead><tr><th>Suite</th><th>Tests</th><th>Couverture</th></tr></thead>
+        <tbody>
+          <tr><td class="param-name">unit/</td><td class="param-desc">53 tests — scanner, backup, restore, space_checker, config, system</td><td><span class="badge badge-green" style="font-size:11px">88–100%</span></td></tr>
+          <tr><td class="param-name">integration/cli</td><td class="param-desc">13 tests — toutes les commandes CLI via CliRunner</td><td><span class="badge badge-green" style="font-size:11px">100%</span></td></tr>
+          <tr><td class="param-name">integration/e2e</td><td class="param-desc">6 tests — cycle complet backup→restore</td><td><span class="badge badge-green" style="font-size:11px">100%</span></td></tr>
+          <tr><td class="param-name">integration/vm</td><td class="param-desc">8 tests — simulation réaliste par distro + perf 100 paquets</td><td><span class="badge badge-blue" style="font-size:11px">97%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'start'})}
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+document.querySelectorAll('.code-copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const pre=btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.textContent).catch(()=>{});
+    setTimeout(()=>{btn.textContent='Copier'},2000);
+  });
+});
+</script>
+</body>
+</html>
