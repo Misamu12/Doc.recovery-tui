@@ -9,9 +9,9 @@ const AlertBox = styled.div`
   gap: 10px;
   font-size: 13px;
   line-height: 1.6;
-  background: ${props => props.bg || 'rgba(59,130,246,0.07)'};
-  border: 1px solid ${props => props.border || 'rgba(59,130,246,0.2)'};
-  color: ${props => props.color || '#93c5fd'};
+  background: ${(props) => props.$bg || 'rgba(59,130,246,0.07)'};
+  border: 1px solid ${(props) => props.$border || 'rgba(59,130,246,0.2)'};
+  color: ${(props) => props.$color || '#93c5fd'};
 `;
 
 const Icon = styled.span`
@@ -21,7 +21,7 @@ const Icon = styled.span`
 `;
 
 export const Alert = ({ icon, bg, border, color, children }) => (
-  <AlertBox bg={bg} border={border} color={color}>
+  <AlertBox $bg={bg} $border={border} $color={color}>
     <Icon>{icon || 'ℹ'}</Icon>
     <span>{children}</span>
   </AlertBox>

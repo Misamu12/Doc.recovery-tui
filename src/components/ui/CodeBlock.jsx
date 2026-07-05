@@ -1,5 +1,5 @@
 // components/ui/CodeBlock.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 const Block = styled.div`
@@ -62,9 +62,10 @@ const Pre = styled.pre`
 
 export const CodeBlock = ({ language, children }) => {
   const [copied, setCopied] = useState(false);
+  const text = String(children ?? '').trim();
 
   const handleCopy = () => {
-    const text = typeof children === 'string' ? children : children.props?.children || '';
+    if (!navigator.clipboard) return;
     navigator.clipboard.writeText(text).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -76,7 +77,7 @@ export const CodeBlock = ({ language, children }) => {
         <Lang>{language}</Lang>
         <CopyBtn onClick={handleCopy}>{copied ? '✓ Copié!' : 'Copier'}</CopyBtn>
       </Header>
-      <Pre>{children}</Pre>
+      <Pre>{text}</Pre>
     </Block>
   );
 };

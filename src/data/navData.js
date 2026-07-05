@@ -1,11 +1,18 @@
-// data/navData.js
 export const navData = [
-  { id: 'intro', label: 'Introduction', section: 'Démarrage' },
-  { id: 'install', label: 'Installation', section: 'Démarrage' },
-  { id: 'quickstart', label: 'Démarrage rapide', section: 'Démarrage' },
+  { id: 'intro', label: 'Introduction', section: 'Demarrage' },
+  { id: 'install', label: 'Installation', section: 'Demarrage' },
+  { id: 'quickstart', label: 'Demarrage rapide', section: 'Demarrage' },
   { id: 'tui', label: 'Lancer le TUI', section: 'Interface TUI' },
-  { id: 'screens', label: 'Écrans', section: 'Interface TUI' },
+  { id: 'screens', label: 'Ecrans', section: 'Interface TUI' },
   { id: 'backup', label: 'backup', section: 'Interface CLI', badge: 'CMD' },
   { id: 'restore', label: 'restore', section: 'Interface CLI', badge: 'CMD' },
-  // ... (copiez la liste complète depuis la première réponse)
+  { id: 'list', label: 'list', section: 'Interface CLI' },
+  { id: 'config', label: 'config', section: 'Interface CLI' },
+  { id: 'scanner', label: 'Scanner', section: 'Core' },
+  { id: 'snapshots', label: 'Snapshots', section: 'Core' },
+  { id: 'github', label: 'GitHub Storage', section: 'Core' },
+  { id: 'compat', label: 'Compatibilite', section: 'Reference' },
+  { id: 'config-yaml', label: 'config.yaml', section: 'Reference' },
+  { id: 'errors', label: 'Erreurs', section: 'Reference' },
+  { id: 'tests', label: 'Tests', section: 'Reference' },
 ];
