@@ -1,19 +1,37 @@
-# React + Vite
+# Documentation Recovery TUI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Logo Recovery TUI](src/assets/ci.png)
 
-Currently, two official plugins are available:
+Cette documentation a été créée pour rendre l’utilisation du logiciel Recovery TUI plus simple, plus claire et plus accessible à tous.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Pourquoi cette documentation est importante
 
-## React Compiler
+Créer une documentation de qualité est essentiel pour :
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- faciliter la prise en main du logiciel par les nouveaux utilisateurs ;
+- expliquer clairement les fonctionnalités et les usages principaux ;
+- réduire les erreurs et les questions répétitives ;
+- aider à la maintenance et à la continuité du projet ;
+- permettre une meilleure collaboration entre les membres de l’équipe.
 
-## Expanding the ESLint configuration
+Une bonne documentation ne sert pas seulement à “expliquer”, elle permet aussi de valoriser le logiciel, de gagner du temps et d’améliorer l’expérience utilisateur.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Documentation en ligne
 
+Vous pouvez consulter la documentation complète ici :
 
-https://misamu12.github.io/Doc.recovery-tui/
+https://misamu12.github.io/Doc_recovery-tui/
+
+## Objectif de ce projet
+
+Ce dépôt a pour but de centraliser les informations utiles sur Recovery TUI afin de fournir une reference claire, structurée et facilement consultable.
+
+## Utilisation
+
+1. Ouvrez la documentation en ligne.
+2. Parcourez les sections principales.
+3. Utilisez les explications fournies pour mieux comprendre le logiciel et l’utiliser efficacement.
+
+---
+
+Si vous souhaitez contribuer ou améliorer cette documentation, n’hésitez pas à proposer des modifications ou à enrichir les contenus existants.
