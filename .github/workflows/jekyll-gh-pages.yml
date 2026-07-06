@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PUBLIC_BASE_PATH: /Doc-recovery-tui/
+  PUBLIC_BASE_PATH: /Doc_recovery-tui/
 
 jobs:
   build:
